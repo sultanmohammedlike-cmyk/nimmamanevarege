@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shop Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0EA;--ink:#17231B;--mute:#5B685F;--line:#D3D9D0;--card:#fff;--brand:#1D5A42;--hot:#F0A81B;--bad:#B2341E;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 Figtree,system-ui,sans-serif}
+h1,h2,h3,.brand{font-family:'Bricolage Grotesque',Figtree,sans-serif;letter-spacing:-.01em;margin:0}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+input[type=checkbox]{width:auto}
+label{display:block;font-weight:500;font-size:13px;margin:10px 0 4px}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font-weight:500}
+button.p{background:var(--brand);border-color:var(--brand);color:#fff}
+button.d{color:var(--bad)}
+button:disabled{opacity:.5;cursor:wait}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.mute{color:var(--mute)}
+.card{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--line)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.narrow{max-width:460px;margin:8vh auto}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.msg{color:var(--bad);min-height:1.3em;margin:10px 0 0}
+header.top{background:var(--ink);color:#fff;position:sticky;top:0;z-index:5}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px}
+.brand{font-size:20px;font-weight:700}
+header.top button{background:transparent;color:#fff;border-color:#4a5a4f}
+.sw{display:flex;align-items:center;gap:8px;font-weight:600;margin:0}
+.sw input{width:42px;height:24px;appearance:none;background:#6b7a70;border-radius:12px;position:relative;cursor:pointer;border:0;padding:0}
+.sw input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
+.sw input:checked{background:#2e9e6f}
+.sw input:checked::after{left:21px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+nav.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:10px 14px;color:var(--mute)}
+nav.tabs button.on{color:var(--ink);border-bottom-color:var(--brand)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;align-items:start}
+.col h3{display:flex;justify-content:space-between;margin-bottom:10px}
+.count{background:var(--ink);color:#fff;border-radius:99px;padding:0 9px;font:600 13px/22px Figtree}
+.tk{background:var(--card);border-radius:6px;border-left:6px solid var(--line);margin-bottom:12px;padding:12px 14px;box-shadow:0 1px 0 var(--line)}
+.tk.placed{border-left-color:var(--hot);animation:ring 1.2s ease-in-out 3}
+.tk.accepted,.tk.preparing{border-left-color:var(--brand)}
+.tk header{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;border-bottom:2px dashed var(--line);padding-bottom:8px}
+.pill{margin-left:auto;font-size:12px;background:var(--bg);border-radius:99px;padding:2px 9px}
+.tk ul{list-style:none;margin:10px 0;padding:0}
+.tk li{display:flex;gap:8px;padding:2px 0}
+.tk li span{font-weight:700;min-width:28px}
+.tk footer{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tk footer b{margin-right:auto;font-size:17px}
+.note{background:#FFF4D6;padding:6px 9px;border-radius:6px;margin:8px 0}
+@keyframes ring{50%{background:#FFF4D6}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.grp{margin-bottom:22px}
+.gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;flex-wrap:wrap}
+.item img,.item .ph{width:52px;height:52px;border-radius:8px;object-fit:cover;background:var(--bg);flex:none}
+.item .nm{flex:1;min-width:140px}
+.veg{display:inline-block;width:12px;height:12px;border:2px solid #2e9e6f;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.veg.nv{border-color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.stats .card b{display:block;font:700 26px 'Bricolage Grotesque'}
+.empty{padding:28px;text-align:center;color:var(--mute);border:2px dashed var(--line);border-radius:10px}
+dialog{border:0;border-radius:14px;padding:20px;width:min(480px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;z-index:20;max-width:90vw}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH ============ -->
+<section id="v-auth" class="wrap narrow" hidden>
+  <h1>Shop Console</h1>
+  <p class="mute">Manage your menu and receive orders.</p>
+  <div class="card">
+    <nav class="tabs" id="auth-tabs">
+      <button class="on" data-a="login">Log in</button><button data-a="signup">Create account</button>
+    </nav>
+    <form id="f-login">
+      <label for="l-email">Email</label><input id="l-email" name="email" type="email" required autocomplete="email">
+      <label for="l-pass">Password</label><input id="l-pass" name="password" type="password" required autocomplete="current-password">
+      <p style="margin-top:14px"><button class="p" type="submit">Log in</button></p>
+    </form>
+    <form id="f-signup" hidden>
+      <label for="s-name">Your name</label><input id="s-name" name="name" required>
+      <label for="s-phone">Phone</label><input id="s-phone" name="phone" type="tel" required>
+      <label for="s-email">Email</label><input id="s-email" name="email" type="email" required autocomplete="email">
+      <label for="s-pass">Password (min 6 characters)</label><input id="s-pass" name="password" type="password" minlength="6" required autocomplete="new-password">
+      <p style="margin-top:14px"><button class="p" type="submit">Create shop owner account</button></p>
+    </form>
+    <p class="msg" id="auth-msg" role="alert"></p>
+  </div>
+</section>
+
+<!-- ============ FIRST-TIME SHOP SETUP ============ -->
+<section id="v-setup" class="wrap narrow" hidden>
+  <h1>Set up your shop</h1>
+  <p class="mute">Customers will see these details. You can edit them later.</p>
+  <div class="card" id="setup-box"></div>
+  <p><button id="setup-out">Log out</button></p>
+</section>
+
+<!-- ============ APP ============ -->
+<section id="v-app" hidden>
+  <header class="top"><div class="wrap">
+    <span class="brand" id="shop-title"></span>
+    <div class="row">
+      <label class="sw"><input type="checkbox" id="open-sw" aria-label="Shop open"><span id="open-lbl">Closed</span></label>
+      <button id="out">Log out</button>
+    </div>
+  </div></header>
+  <main class="wrap">
+    <nav class="tabs" id="tabs">
+      <button data-t="orders" class="on">Orders</button><button data-t="menu">Menu</button>
+      <button data-t="history">History &amp; earnings</button><button data-t="shop">Shop details</button>
+    </nav>
+
+    <div id="t-orders">
+      <div class="cols">
+        <div class="col"><h3>New <span class="count" id="c-new">0</span></h3><div id="col-new"></div></div>
+        <div class="col"><h3>In the kitchen <span class="count" id="c-kit">0</span></h3><div id="col-kit"></div></div>
+        <div class="col"><h3>Ready and on the way <span class="count" id="c-rdy">0</span></h3><div id="col-rdy"></div></div>
+      </div>
+    </div>
+
+    <div id="t-menu" hidden>
+      <form class="row" id="f-cat" style="margin-bottom:16px">
+        <input id="cat-name" placeholder="New category, e.g. Starters or Dairy" style="flex:1;min-width:200px" required maxlength="60">
+        <button type="submit">Add category</button>
+        <button type="button" class="p" id="add-prod">Add item</button>
+      </form>
+      <div id="menu"></div>
+    </div>
+
+    <div id="t-history" hidden>
+      <div class="stats" id="stats"></div>
+      <div id="hist"></div>
+    </div>
+
+    <div id="t-shop" hidden><div class="card" id="shop-box" style="max-width:620px"></div></div>
+  </main>
+</section>
+
+<dialog id="d-prod">
+  <form id="f-prod">
+    <h2 id="dp-title">Add item</h2>
+    <label for="p-name">Name</label><input id="p-name" required maxlength="120">
+    <label for="p-desc">Description</label><textarea id="p-desc" rows="2" maxlength="300"></textarea>
+    <div class="grid2">
+      <div><label for="p-price">Price (₹)</label><input id="p-price" type="number" min="0" step="0.5" required></div>
+      <div><label for="p-stock">Stock (blank = unlimited)</label><input id="p-stock" type="number" min="0" step="1"></div>
+    </div>
+    <label for="p-cat">Category</label><select id="p-cat"></select>
+    <label for="p-img">Photo (JPG/PNG/WebP, max 2 MB)</label><input id="p-img" type="file" accept="image/*">
+    <div class="row" style="margin-top:12px">
+      <label class="row" style="margin:0"><input type="checkbox" id="p-veg"> Vegetarian</label>
+      <label class="row" style="margin:0"><input type="checkbox" id="p-av"> Available to order</label>
+    </div>
+    <p class="msg" id="p-msg" role="alert"></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" id="p-cancel">Cancel</button><button class="p" type="submit" id="p-save">Save item</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" hidden role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<script>
+// ======== CONFIG: confirm both values in Supabase > Project Settings > API ========
+const SUPABASE_URL = 'https://dplaucmoydabawybbjum.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_56pYKQPr8pGh7fRH4o31fw_ydzP4HFy';
+// ==================================================================================
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let me, shop, cats = [], prods = [], orders = [], chan, pollId, audio, editing = null;
+
+// ---------- helpers (user text is always inserted as text, never as HTML) ----------
+function h(tag, a = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(a)) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => { if (c === false || c == null) return; e.append(c instanceof Node ? c : document.createTextNode(c)); });
+  return e;
+}
+const money = n => '₹' + (+n).toFixed(2).replace(/\.00$/, '');
+const show = id => ['v-auth', 'v-setup', 'v-app'].forEach(v => $(v).hidden = v !== id);
+let tt; function toast(m) { const t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3500); }
+function ago(ts) { const m = Math.floor((Date.now() - new Date(ts)) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : new Date(ts).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }); }
+function beep() {
+  try { audio = audio || new AudioContext(); [880, 1175].forEach((f, i) => { const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = f; o.connect(g); g.connect(audio.destination); g.gain.setValueAtTime(.25, audio.currentTime + i * .22); g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + i * .22 + .2); o.start(audio.currentTime + i * .22); o.stop(audio.currentTime + i * .22 + .21); }); } catch (e) {}
+}
+document.addEventListener('click', () => { try { audio = audio || new AudioContext(); audio.resume(); } catch (e) {} });
+async function upload(bucket, file) {
+  if (!file.type.startsWith('image/')) throw new Error('Please choose an image file.');
+  if (file.size > 2 * 1024 * 1024) throw new Error('Image is larger than 2 MB.');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = `${me.id}/${Date.now()}.${ext}`;
+  const { error } = await db.storage.from(bucket).upload(path, file, { contentType: file.type });
+  if (error) throw error;
+  return db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+
+// ---------- auth ----------
+$('auth-tabs').onclick = e => {
+  const a = e.target.dataset.a; if (!a) return;
+  [...$('auth-tabs').children].forEach(b => b.classList.toggle('on', b === e.target));
+  $('f-login').hidden = a !== 'login'; $('f-signup').hidden = a !== 'signup'; $('auth-msg').textContent = '';
+};
+$('f-login').onsubmit = async e => {
+  e.preventDefault(); const f = new FormData(e.target);
+  const { data, error } = await db.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+  if (error) return $('auth-msg').textContent = error.message;
+  boot(data.user);
+};
+$('f-signup').onsubmit = async e => {
+  e.preventDefault(); const f = new FormData(e.target);
+  const { data, error } = await db.auth.signUp({
+    email: f.get('email'), password: f.get('password'),
+    options: { data: { role: 'shop_owner', name: f.get('name'), phone: f.get('phone') } }
+  });
+  if (error) return $('auth-msg').textContent = error.message;
+  if (!data.session) return $('auth-msg').textContent = 'Check your email to confirm your account, then log in.';
+  boot(data.user);
+};
+async function logout() {
+  if (chan) db.removeChannel(chan); clearInterval(pollId);
+  await db.auth.signOut(); shop = null; document.title = 'Shop Console'; show('v-auth');
+}
+$('out').onclick = $('setup-out').onclick = logout;
+
+async function boot(user) {
+  const { data: p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  if (!p || p.role !== 'shop_owner') {
+    await db.auth.signOut(); show('v-auth');
+    return $('auth-msg').textContent = 'This site is for shop owners. Use the customer or delivery partner site for your account.';
+  }
+  me = user;
+  const { data, error } = await db.from('shops').select('*').eq('owner_id', me.id).maybeSingle();
+  if (error) return toast(error.message);
+  shop = data;
+  if (!shop) { $('setup-box').replaceChildren(shopForm()); return show('v-setup'); }
+  startApp();
+}
+
+// ---------- shop form (create + edit) ----------
+function shopForm() {
+  const s = shop || {};
+  const f = h('form', {},
+    h('label', { for: 'sh-name' }, 'Shop name'), h('input', { id: 'sh-name', required: true, maxlength: 80, value: s.name || '' }),
+    h('label', { for: 'sh-type' }, 'Type'),
+    h('select', { id: 'sh-type' }, h('option', { value: 'food' }, 'Restaurant / food'), h('option', { value: 'grocery' }, 'Grocery / store')),
+    h('label', { for: 'sh-desc' }, 'Short description'), h('textarea', { id: 'sh-desc', rows: 2, maxlength: 300 }, s.description || ''),
+    h('label', { for: 'sh-addr' }, 'Full address'), h('textarea', { id: 'sh-addr', rows: 2, required: true }, s.address || ''),
+    h('div', { class: 'grid2' },
+      h('div', {}, h('label', { for: 'sh-lat' }, 'Latitude'), h('input', { id: 'sh-lat', type: 'number', step: 'any', value: s.lat ?? '' })),
+      h('div', {}, h('label', { for: 'sh-lng' }, 'Longitude'), h('input', { id: 'sh-lng', type: 'number', step: 'any', value: s.lng ?? '' }))),
+    h('p', {}, h('button', {
+      type: 'button', onclick: () => navigator.geolocation.getCurrentPosition(
+        pos => { f.querySelector('#sh-lat').value = pos.coords.latitude.toFixed(6); f.querySelector('#sh-lng').value = pos.coords.longitude.toFixed(6); },
+        () => toast('Could not get location. Enter coordinates by hand.'))
+    }, 'Use my current location')),
+    h('div', { class: 'grid2' },
+      h('div', {}, h('label', { for: 'sh-min' }, 'Minimum order (₹)'), h('input', { id: 'sh-min', type: 'number', min: 0, step: 1, value: s.min_order ?? 0 })),
+      h('div', {}, h('label', { for: 'sh-rad' }, 'Delivery radius (km)'), h('input', { id: 'sh-rad', type: 'number', min: 1, step: .5, value: s.delivery_radius_km ?? 5 }))),
+    h('label', { for: 'sh-logo' }, 'Logo (optional, max 2 MB)'), h('input', { id: 'sh-logo', type: 'file', accept: 'image/*' }),
+    h('p', { class: 'msg', role: 'alert' }),
+    h('button', { class: 'p', type: 'submit' }, shop ? 'Save changes' : 'Create shop'));
+  f.querySelector('#sh-type').value = s.type || 'food';
+  f.onsubmit = async e => {
+    e.preventDefault(); const btn = f.querySelector('button[type=submit]'), msg = f.querySelector('.msg'); btn.disabled = true; msg.textContent = '';
+    try {
+      const num = id => { const v = f.querySelector(id).value; return v === '' ? null : +v; };
+      const row = {
+        name: f.querySelector('#sh-name').value.trim(), type: f.querySelector('#sh-type').value,
+        description: f.querySelector('#sh-desc').value.trim() || null, address: f.querySelector('#sh-addr').value.trim(),
+        lat: num('#sh-lat'), lng: num('#sh-lng'), min_order: num('#sh-min') ?? 0, delivery_radius_km: num('#sh-rad') ?? 5
+      };
+      const file = f.querySelector('#sh-logo').files[0];
+      if (file) row.logo_url = await upload('shop-logos', file);
+      const res = shop ? await db.from('shops').update(row).eq('id', shop.id).select().single()
+                       : await db.from('shops').insert({ ...row, owner_id: me.id }).select().single();
+      if (res.error) throw res.error;
+      const first = !shop; shop = res.data; toast('Saved');
+      if (first) startApp(); else $('shop-title').textContent = shop.name;
+    } catch (err) { msg.textContent = err.message; }
+    btn.disabled = false;
+  };
+  return f;
+}
+
+// ---------- app shell ----------
+async function startApp() {
+  show('v-app'); $('shop-title').textContent = shop.name; $('shop-box').replaceChildren(shopForm());
+  syncOpen(); await Promise.all([loadMenu(), loadOrders()]); subscribe();
+  clearInterval(pollId); pollId = setInterval(loadOrders, 30000);
+}
+$('tabs').onclick = e => {
+  const t = e.target.dataset.t; if (!t) return;
+  [...$('tabs').children].forEach(b => b.classList.toggle('on', b === e.target));
+  ['orders', 'menu', 'history', 'shop'].forEach(x => $('t-' + x).hidden = x !== t);
+};
+function syncOpen() { $('open-sw').checked = shop.is_open; $('open-lbl').textContent = shop.is_open ? 'Open' : 'Closed'; }
+$('open-sw').onchange = async e => {
+  const { error } = await db.from('shops').update({ is_open: e.target.checked }).eq('id', shop.id);
+  if (error) { toast(error.message); e.target.checked = shop.is_open; return; }
+  shop.is_open = e.target.checked; syncOpen();
+  toast(shop.is_open ? 'You are open. Customers can order.' : 'You are closed. New orders are paused.');
+};
+
+// ---------- orders ----------
+async function loadOrders() {
+  if (!shop) return;
+  const { data, error } = await db.from('orders').select('*, order_items(*)').eq('shop_id', shop.id).order('created_at', { ascending: false }).limit(200);
+  if (error) return toast(error.message);
+  orders = data; renderOrders(); renderHistory();
+}
+function subscribe() {
+  if (chan) db.removeChannel(chan);
+  chan = db.channel('shop-orders').on('postgres_changes',
+    { event: '*', schema: 'public', table: 'orders', filter: `shop_id=eq.${shop.id}` },
+    p => { if (p.eventType === 'INSERT') { beep(); toast('New order received'); } loadOrders(); }).subscribe();
+}
+async function setStatus(id, s) {
+  if (s === 'rejected' && !confirm('Reject this order? The customer will be notified.')) return;
+  const { error } = await db.rpc('update_order_status', { p_order_id: id, p_new_status: s });
+  if (error) toast(error.message); else loadOrders();
+}
+function ticket(o) {
+  const acts = { placed: [['Accept', 'accepted', 'p'], ['Reject', 'rejected', 'd']], accepted: [['Start preparing', 'preparing', ''], ['Mark ready', 'ready', 'p']], preparing: [['Mark ready', 'ready', 'p']] }[o.status] || [];
+  const state = o.status === 'ready' ? (o.partner_id ? 'Rider assigned, waiting for pickup' : 'Waiting for a rider') : o.status === 'picked_up' ? 'Out for delivery' : '';
+  return h('article', { class: 'tk ' + o.status },
+    h('header', {}, h('b', {}, '#' + o.id.slice(0, 6)), h('span', { class: 'mute' }, ago(o.created_at)), h('span', { class: 'pill' }, o.payment_method === 'cod' ? 'Cash on delivery' : 'Paid online')),
+    h('p', { style: 'margin:8px 0 0' }, h('b', {}, o.customer_name || 'Customer'), ' ', h('span', { class: 'mute' }, o.customer_phone || '')),
+    h('ul', {}, o.order_items.map(i => h('li', {}, h('span', {}, i.qty + '×'), i.name))),
+    o.notes && h('p', { class: 'note' }, 'Note: ' + o.notes),
+    h('footer', {}, h('b', {}, money(o.subtotal)), state && h('span', { class: 'mute' }, state),
+      acts.map(([t, s, c]) => h('button', { class: c, onclick: () => setStatus(o.id, s) }, t))));
+}
+function fill(col, cnt, list, empty) {
+  $(col).replaceChildren(...(list.length ? list.map(ticket) : [h('p', { class: 'empty' }, empty)])); $(cnt).textContent = list.length;
+}
+function renderOrders() {
+  const nw = orders.filter(o => o.status === 'placed');
+  fill('col-new', 'c-new', nw, 'No new orders. Keep this tab open and a sound will play when one arrives.');
+  fill('col-kit', 'c-kit', orders.filter(o => ['accepted', 'preparing'].includes(o.status)), 'Nothing being prepared.');
+  fill('col-rdy', 'c-rdy', orders.filter(o => ['ready', 'picked_up'].includes(o.status)).reverse(), 'Nothing waiting for pickup.');
+  document.title = nw.length ? `(${nw.length}) New order | Shop Console` : 'Shop Console';
+}
+function renderHistory() {
+  const done = orders.filter(o => o.status === 'delivered'), day = new Date(); day.setHours(0, 0, 0, 0);
+  const sum = d => done.filter(o => new Date(o.delivered_at || o.created_at) >= d).reduce((a, o) => a + +o.subtotal, 0);
+  const wk = new Date(day); wk.setDate(wk.getDate() - 6);
+  $('stats').replaceChildren(...[['Today', sum(day)], ['Last 7 days', sum(wk)], ['Latest 200 orders', sum(new Date(0))]]
+    .map(([l, v]) => h('div', { class: 'card' }, h('span', { class: 'mute' }, l), h('b', {}, money(v)))));
+  const fin = orders.filter(o => ['delivered', 'cancelled', 'rejected'].includes(o.status)).slice(0, 50);
+  $('hist').replaceChildren(...(fin.length ? fin.map(o => h('div', { class: 'item' },
+    h('div', { class: 'nm' }, h('b', {}, '#' + o.id.slice(0, 6)), ' ', h('span', { class: 'mute' }, new Date(o.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }))),
+    h('span', {}, o.order_items.reduce((a, i) => a + i.qty, 0) + ' items'),
+    h('span', { class: 'pill' }, o.status), h('b', {}, money(o.subtotal)))) : [h('p', { class: 'empty' }, 'Finished orders will appear here. Earnings count the item total of delivered orders; the delivery fee goes to the rider.')]));
+}
+
+// ---------- menu ----------
+async function loadMenu() {
+  const [c, p] = await Promise.all([
+    db.from('categories').select('*').eq('shop_id', shop.id).order('sort_order').order('name'),
+    db.from('products').select('*').eq('shop_id', shop.id).order('created_at')]);
+  if (c.error || p.error) return toast((c.error || p.error).message);
+  cats = c.data; prods = p.data; renderMenu();
+}
+function prodRow(p) {
+  return h('div', { class: 'item' },
+    p.image_url ? h('img', { src: p.image_url, alt: '', loading: 'lazy' }) : h('div', { class: 'ph' }),
+    h('div', { class: 'nm' }, h('span', { class: 'veg' + (p.is_veg ? '' : ' nv'), title: p.is_veg ? 'Vegetarian' : 'Non-vegetarian' }), h('b', {}, p.name),
+      h('div', { class: 'mute' }, money(p.price) + (p.stock == null ? ', unlimited stock' : ', ' + p.stock + ' in stock'))),
+    h('label', { class: 'sw', style: 'color:var(--ink)' }, h('input', {
+      type: 'checkbox', checked: p.is_available || false, onchange: async e => {
+        const { error } = await db.from('products').update({ is_available: e.target.checked }).eq('id', p.id);
+        if (error) { toast(error.message); e.target.checked = !e.target.checked; } else p.is_available = e.target.checked;
+      }
+    }), 'Available'),
+    h('button', { onclick: () => openProd(p) }, 'Edit'),
+    h('button', { class: 'd', onclick: () => delProd(p) }, 'Delete'));
+}
+function renderMenu() {
+  const box = $('menu'); box.replaceChildren();
+  const groups = [...cats.map(c => ({ c, items: prods.filter(p => p.category_id === c.id) })),
+    { c: null, items: prods.filter(p => !cats.some(c => c.id === p.category_id)) }];
+  groups.forEach(g => {
+    if (!g.c && !g.items.length) return;
+    box.append(h('section', { class: 'grp' },
+      h('div', { class: 'gh' }, h('h3', {}, g.c ? g.c.name : 'No category'), g.c && h('button', { class: 'd', onclick: () => delCat(g.c) }, 'Delete category')),
+      g.items.length ? g.items.map(prodRow) : h('p', { class: 'mute' }, 'No items in this category yet.')));
+  });
+  if (!prods.length && !cats.length) box.append(h('p', { class: 'empty' }, 'Your menu is empty. Add a category, then add your first item.'));
+}
+$('f-cat').onsubmit = async e => {
+  e.preventDefault(); const name = $('cat-name').value.trim(); if (!name) return;
+  const { error } = await db.from('categories').insert({ shop_id: shop.id, name, sort_order: cats.length });
+  if (error) return toast(error.message); $('cat-name').value = ''; loadMenu();
+};
+async function delCat(c) {
+  if (!confirm(`Delete category "${c.name}"? Its items stay in your menu without a category.`)) return;
+  const { error } = await db.from('categories').delete().eq('id', c.id); if (error) toast(error.message); else loadMenu();
+}
+async function delProd(p) {
+  if (!confirm(`Delete "${p.name}"? Past orders keep their record of it.`)) return;
+  const { error } = await db.from('products').delete().eq('id', p.id); if (error) toast(error.message); else loadMenu();
+}
+function openProd(p) {
+  editing = p || null; $('dp-title').textContent = p ? 'Edit item' : 'Add item'; $('p-msg').textContent = '';
+  $('p-name').value = p?.name || ''; $('p-desc').value = p?.description || ''; $('p-price').value = p?.price ?? '';
+  $('p-stock').value = p?.stock ?? ''; $('p-img').value = ''; $('p-veg').checked = p ? p.is_veg : true; $('p-av').checked = p ? p.is_available : true;
+  $('p-cat').replaceChildren(h('option', { value: '' }, 'No category'), cats.map(c => h('option', { value: c.id }, c.name)));
+  $('p-cat').value = p?.category_id || ''; $('d-prod').showModal();
+}
+$('add-prod').onclick = () => openProd(null);
+$('p-cancel').onclick = () => $('d-prod').close();
+$('f-prod').onsubmit = async e => {
+  e.preventDefault(); const btn = $('p-save'); btn.disabled = true; $('p-msg').textContent = '';
+  try {
+    const row = {
+      name: $('p-name').value.trim(), description: $('p-desc').value.trim() || null, price: +$('p-price').value,
+      stock: $('p-stock').value === '' ? null : Math.max(0, Math.floor(+$('p-stock').value)),
+      category_id: $('p-cat').value || null, is_veg: $('p-veg').checked, is_available: $('p-av').checked
+    };
+    const file = $('p-img').files[0]; if (file) row.image_url = await upload('product-images', file);
+    const { error } = editing ? await db.from('products').update(row).eq('id', editing.id) : await db.from('products').insert({ ...row, shop_id: shop.id });
+    if (error) throw error;
+    $('d-prod').close(); toast('Saved'); loadMenu();
+  } catch (err) { $('p-msg').textContent = err.message; }
+  btn.disabled = false;
+};
+
+// ---------- start ----------
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  session ? boot(session.user) : show('v-auth');
+})();
+</script>
+</body>
+</html>
